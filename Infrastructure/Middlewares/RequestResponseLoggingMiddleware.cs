@@ -118,7 +118,7 @@ namespace ExternalServices.Gateway.Api.Infrastructure.Middlewares
             response.Body.Seek(0, SeekOrigin.Begin);
 
             _logger.LogInformation("Http Response Information:{NewLine} StatusCode:{StatusCode} " +
-                "Response Body: {@RequestBody}", Environment.NewLine, response.StatusCode, text);
+                "Response Body: {@ResponseBody}", Environment.NewLine, response.StatusCode, text);
         }
 
         #endregion
