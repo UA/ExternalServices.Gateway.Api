@@ -1,5 +1,8 @@
 using ExternalServices.Gateway.Api.Extensions;
+using HealthChecks.UI.Client;
+using HealthChecks.UI.Configuration;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +40,8 @@ namespace ExternalServices.Gateway.Api
 
             services.AddAutoMapper(typeof(AutoMapperExtenstion).Assembly);
 
+            services.RegisterHealthChecks(Configuration);
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ExternalServices.Gateway.Api", Version = "v1" });
@@ -71,6 +76,20 @@ namespace ExternalServices.Gateway.Api
             app.UseSerilogRequestLogging();
 
             app.UseRequestResponseLogging();
+
+            app.UseHealthChecks("/healthchecks", new HealthCheckOptions()
+            {
+                Predicate = _ => true,
+                ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+            });
+
+            app.UseHealthChecksUI(delegate (Options options)
+            {
+                options.UIPath = "/healthchecks-ui";
+                options.ApiPath = "/healthchecks-ui-api";
+                options.AddCustomStylesheet("Content/css/healthcheck.scss");
+            });
+
 
             app.UseEndpoints(endpoints =>
             {
